@@ -4631,8 +4631,8 @@ body.is-admin .hero .photo-caption {
 }
 .adviser-photo .media-image {
   image-rendering: auto;
-  backface-visibility: hidden;
-  filter: contrast(1.04) saturate(1.03);
+  backface-visibility: visible;
+  filter: none;
 }
 .student-group > .student-grid > .student-card:nth-child(n) {
   display: grid;
@@ -4696,4 +4696,93 @@ body.is-admin .hero .photo-caption {
 }
 body.is-admin .hero .photo-sticker {
   display: none;
+}
+
+/* Larger adviser portrait with natural browser image smoothing. */
+.adviser-profile {
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+.adviser-photo {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+.adviser-photo .media-image {
+  image-rendering: auto;
+  filter: none;
+  backface-visibility: visible;
+}
+@media (max-width: 760px) {
+  .adviser-profile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .adviser-photo {
+    max-width: 340px;
+  }
+}
+
+/* Consistent display quality for every uploaded photo. */
+.media-image,
+.note .note-image-frame .note-image,
+.album-photo-view img {
+  image-rendering: auto;
+  filter: none;
+  backface-visibility: visible;
+}
+/* Avoid fractional rotation of photo surfaces, which can soften fine detail.
+   The front/back flip itself and saved crop zoom are retained. */
+.hero .photo-area,
+.album-card .album-cover,
+.gallery-image,
+.note:has(.note-image) {
+  transform: none !important;
+}
+.student-card {
+  grid-template-columns: 104px minmax(0, 1fr);
+}
+.student-card .student-photo {
+  width: 104px;
+  aspect-ratio: 1;
+}
+.note-with-image,
+.note-full .note-with-image {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 50%);
+  gap: 14px;
+}
+.note .note-image-frame .note-image {
+  object-fit: contain;
+}
+.gallery {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.gallery-image {
+  aspect-ratio: 1;
+}
+.album-cover {
+  height: clamp(210px, 29svh, 350px);
+}
+.album-photo-view img {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+@media (max-width: 760px) {
+  .student-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .student-card .student-photo {
+    width: 96px;
+  }
+  .note-with-image,
+  .note-full .note-with-image {
+    gap: 10px;
+  }
+  .album-cover {
+    height: clamp(190px, 27svh, 290px);
+  }
 }
