@@ -514,7 +514,7 @@ function media(image, label = "Your photo here") {
           class="media-image"
           src="${esc(imageSource(image))}"
           alt="${esc(label)}"
-          style="transform:scale(${Number(image.zoom) || 1});object-position:${Number(image.x) ?? 50}% ${Number(image.y) ?? 50}%"
+          style="transform:${(Number(image.zoom) || 1) === 1 ? "none" : `scale(${Number(image.zoom) || 1})`};object-position:${Number(image.x) ?? 50}% ${Number(image.y) ?? 50}%"
         />
       `
     : /* HTML */ `
