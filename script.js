@@ -514,7 +514,7 @@ function media(image, label = "Your photo here") {
           class="media-image"
           src="${esc(imageSource(image))}"
           alt="${esc(label)}"
-          style="transform:${(Number(image.zoom) || 1) === 1 ? "none" : `scale(${Number(image.zoom) || 1})`};object-position:${Number(image.x) ?? 50}% ${Number(image.y) ?? 50}%"
+          style="transform:scale(${Number(image.zoom) || 1});object-position:${Number(image.x) ?? 50}% ${Number(image.y) ?? 50}%"
         />
       `
     : /* HTML */ `
@@ -1492,7 +1492,8 @@ for (const el of [$("#site-header"), $("main"), $(".section-rail")])
   el.inert = true;
 if (matchMedia("(prefers-reduced-motion: reduce)").matches)
   intro.classList.add("reduced-opening");
-// Native scroll snapping centers sections below the header without trapping long content.
+// Free scrolling: this listener only highlights the visible section in navigation.
+// It never moves the page or centers a panel.
 let scrollFrame = 0;
 function updateSectionNavigation() {
   const headerHeight = $("#site-header").getBoundingClientRect().height;
