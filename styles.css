@@ -1034,7 +1034,7 @@ body.is-admin .photo-area {
   --header-height: 94px;
 }
 html {
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: none;
   scroll-padding-top: var(--header-height);
 }
 body {
@@ -1157,8 +1157,8 @@ main {
 section {
   min-height: calc(100svh - var(--header-height));
   padding: 35px 6%;
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
   isolation: isolate;
   display: flex;
   flex-direction: column;
@@ -2217,7 +2217,7 @@ dialog {
 }
 @media (prefers-reduced-motion: reduce) {
   html {
-    scroll-snap-type: y proximity;
+    scroll-snap-type: none;
   }
   .opening {
     display: none;
@@ -4631,8 +4631,8 @@ body.is-admin .hero .photo-caption {
 }
 .adviser-photo .media-image {
   image-rendering: auto;
-  backface-visibility: visible;
-  filter: none;
+  backface-visibility: hidden;
+  filter: contrast(1.04) saturate(1.03);
 }
 .student-group > .student-grid > .student-card:nth-child(n) {
   display: grid;
@@ -4682,107 +4682,66 @@ body.is-admin .hero .photo-caption {
     padding: 18px;
   }
 }
-@media (max-width: 600px) {
+
+/* Beryl: free scrolling and compact mobile student cards. */
+html,
+body {
+  scroll-snap-type: none;
+}
+main > section {
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+}
+
+@media (max-width: 760px) {
+  #students .student-grid,
+  .student-grid,
   .all-students .student-grid {
-    grid-template-columns: 1fr;
-  }
-  .all-students .student-card {
-    display: grid !important;
-  }
-  .all-students .student-card h4 {
-    min-height: 0;
-    text-align: left;
-  }
-}
-body.is-admin .hero .photo-sticker {
-  display: none;
-}
-
-/* Larger adviser portrait with natural browser image smoothing. */
-.adviser-profile {
-  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
-  gap: 28px;
-  align-items: center;
-}
-.adviser-photo {
-  width: 100%;
-  max-width: 340px;
-  height: auto;
-  aspect-ratio: 1;
-  margin-inline: auto;
-}
-.adviser-photo .media-image {
-  image-rendering: auto;
-  filter: none;
-  backface-visibility: visible;
-}
-@media (max-width: 760px) {
-  .adviser-profile {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-  }
-  .adviser-photo {
-    max-width: 340px;
-  }
-}
-
-/* Consistent display quality for every uploaded photo. */
-.media-image,
-.note .note-image-frame .note-image,
-.album-photo-view img {
-  image-rendering: auto;
-  filter: none;
-  backface-visibility: visible;
-}
-/* Avoid fractional rotation of photo surfaces, which can soften fine detail.
-   The front/back flip itself and saved crop zoom are retained. */
-.hero .photo-area,
-.album-card .album-cover,
-.gallery-image,
-.note:has(.note-image) {
-  transform: none !important;
-}
-.student-card {
-  grid-template-columns: 104px minmax(0, 1fr);
-}
-.student-card .student-photo {
-  width: 104px;
-  aspect-ratio: 1;
-}
-.note-with-image,
-.note-full .note-with-image {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 50%);
-  gap: 14px;
-}
-.note .note-image-frame .note-image {
-  object-fit: contain;
-}
-.gallery {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-}
-.gallery-image {
-  aspect-ratio: 1;
-}
-.album-cover {
-  height: clamp(210px, 29svh, 350px);
-}
-.album-photo-view img {
-  width: auto;
-  height: auto;
-  object-fit: contain;
-}
-@media (max-width: 760px) {
-  .student-card {
-    grid-template-columns: 96px minmax(0, 1fr);
-  }
-  .student-card .student-photo {
-    width: 96px;
-  }
-  .note-with-image,
-  .note-full .note-with-image {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
-  .album-cover {
-    height: clamp(190px, 27svh, 290px);
+
+  .student-group > .student-grid > .student-card:nth-child(n),
+  .student-grid.search-results-grid > .student-card,
+  .all-students .student-card {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 8px;
+    gap: 6px;
+    text-align: center;
+    transform: none;
+  }
+
+  .student-card .student-photo,
+  .all-students .student-card .student-photo {
+    width: 100%;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+    align-self: stretch;
+  }
+
+  .student-card h4,
+  .all-students .student-card h4 {
+    min-height: 0;
+    margin: 2px 0;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .student-card .student-quote {
+    margin: 0;
+    padding: 7px;
+    font-size: 12px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 }
