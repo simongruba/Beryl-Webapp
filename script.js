@@ -1285,6 +1285,14 @@ function birthdayDetail(id) {
         <div class="mini-profile-photo">${media(student.images?.[0], student.name)}</div>
         <h3>${esc(student.name)}</h3>
         <p>${esc(monthName)} ${String(birthday.day).padStart(2, "0")}</p>
+        ${
+          admin()
+            ? `<div class="birthday-detail-admin">
+                 <button class="outline" data-edit-birthday="${esc(birthday.id)}">Edit birthday</button>
+                 <button class="outline danger-lite" data-delete-birthday="${esc(birthday.id)}">Remove</button>
+               </div>`
+            : ""
+        }
       </div>
     `,
   );
@@ -1457,7 +1465,10 @@ function birthdayCalendarHTML() {
     groups.get(month).push(entry);
   }
   if (!groups.size) return `<p class="hint">No birthdays have been added yet.</p>`;
-  return [...groups.entries()]
+  const manageHint = admin()
+    ? `<p class="birthday-calendar-manage-hint">Admin mode · You can edit or remove birthdays from any month here.</p>`
+    : "";
+  return manageHint + [...groups.entries()]
     .sort((a, b) => a[0] - b[0])
     .map(
       ([month, entries]) => /* HTML */ `
@@ -1468,11 +1479,21 @@ function birthdayCalendarHTML() {
               .sort((a, b) => Number(a.birthday.day) - Number(b.birthday.day))
               .map(
                 ({ birthday, student }) => /* HTML */ `
-                  <button data-birthday-detail="${esc(birthday.id)}" class="birthday-calendar-row">
-                    <strong>${String(birthday.day).padStart(2, "0")}</strong>
-                    <span>${esc(student.name)}</span>
-                    <em>Birthday spotlight ↗</em>
-                  </button>
+                  <div class="birthday-calendar-item">
+                    <button data-birthday-detail="${esc(birthday.id)}" class="birthday-calendar-row">
+                      <strong>${String(birthday.day).padStart(2, "0")}</strong>
+                      <span>${esc(student.name)}</span>
+                      <em>Birthday spotlight ↗</em>
+                    </button>
+                    ${
+                      admin()
+                        ? `<div class="birthday-calendar-actions">
+                             <button class="outline" data-edit-birthday="${esc(birthday.id)}">Edit</button>
+                             <button class="outline danger-lite" data-delete-birthday="${esc(birthday.id)}">Remove</button>
+                           </div>`
+                        : ""
+                    }
+                  </div>
                 `,
               )
               .join("")}
