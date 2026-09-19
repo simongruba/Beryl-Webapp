@@ -2861,3 +2861,188 @@ main > section,
     padding: 3px 1px 8px !important;
   }
 }
+
+/* =========================================================
+   BERYL V19 — MOBILE HERO / CLASS PORTRAIT FIX
+   Keeps the action buttons separate from the portrait card,
+   prevents the tape/title row from colliding with them, and
+   keeps both portrait labels visible on narrow phones.
+   ========================================================= */
+@media (max-width: 760px) {
+  /* Give the opening controls their own clear row. */
+  .hero .home-actions {
+    position: relative !important;
+    z-index: 6 !important;
+    width: 100% !important;
+    margin: 0 auto 18px !important;
+    padding: 0 4px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .hero .home-actions .pill,
+  .hero .home-actions .outline {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding: 9px 10px !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* The portrait itself must stay fully inside the viewport. */
+  .hero .photo-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 26px !important;
+    padding: 10px 10px 11px !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .hero .photo-area:hover {
+    transform: none !important;
+  }
+
+  /* Keep the decorative tape inside the card instead of on top of the buttons. */
+  .hero .photo-area .tape {
+    top: -12px !important;
+    left: 50% !important;
+    width: 86px !important;
+    height: 24px !important;
+    transform: translateX(-50%) rotate(-4deg) !important;
+    z-index: 2 !important;
+  }
+
+  /* Both labels remain readable on narrow screens. */
+  .yearbook-photo-title {
+    position: relative !important;
+    z-index: 3 !important;
+    width: 100% !important;
+    margin: 0 0 8px !important;
+    padding: 4px 6px 7px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    font-size: 7px !important;
+    letter-spacing: .75px !important;
+    line-height: 1.2 !important;
+  }
+
+  .yearbook-photo-title span {
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  .yearbook-photo-title span:first-child {
+    text-align: left !important;
+  }
+
+  .yearbook-photo-title span:last-child {
+    text-align: right !important;
+    color: #617c58 !important;
+    font-weight: 700 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero .home-actions {
+    gap: 6px !important;
+  }
+
+  .hero .home-actions .pill,
+  .hero .home-actions .outline {
+    padding-inline: 7px !important;
+    font-size: 9px !important;
+  }
+
+  .yearbook-photo-title {
+    font-size: 6.5px !important;
+    letter-spacing: .45px !important;
+    column-gap: 5px !important;
+    padding-inline: 4px !important;
+  }
+}
+
+/* =========================================================
+   BERYL V20 — HEADER SUBTITLE CONTRAST FIX
+   Make “GRADE 10 · OUR CLASSROOM” clearly readable on the
+   light glass header, especially on phones.
+   ========================================================= */
+header#site-header .brand .brand-word small {
+  color: #315f43 !important;
+  opacity: 1 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.92) !important;
+  -webkit-text-fill-color: #315f43 !important;
+}
+
+@media (max-width: 760px) {
+  header#site-header .brand .brand-word small {
+    color: #315f43 !important;
+    -webkit-text-fill-color: #315f43 !important;
+    font-size: 6.8px !important;
+    line-height: 1.15 !important;
+    letter-spacing: .65px !important;
+    font-weight: 900 !important;
+    margin-top: 4px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  header#site-header .brand .brand-word small {
+    font-size: 6.2px !important;
+    letter-spacing: .48px !important;
+  }
+}
+
+
+/* =========================================================
+   BERYL V21 — FORCE DARK HEADER SUBTITLE
+   The mobile header subtitle was still inheriting a pale green
+   from legacy styles on some browsers/cached layouts. This rule
+   uses a dedicated class and intentionally wins the cascade.
+   ========================================================= */
+header#site-header a.brand .brand-word > small.brand-subtitle {
+  color: #073f2d !important;
+  -webkit-text-fill-color: #073f2d !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+@media (max-width: 760px) {
+  header#site-header a.brand .brand-word > small.brand-subtitle {
+    color: #063b2a !important;
+    -webkit-text-fill-color: #063b2a !important;
+    opacity: 1 !important;
+    font-size: 7.4px !important;
+    line-height: 1.12 !important;
+    letter-spacing: .42px !important;
+    font-weight: 900 !important;
+    margin-top: 4px !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 430px) {
+  header#site-header a.brand .brand-word > small.brand-subtitle {
+    color: #053725 !important;
+    -webkit-text-fill-color: #053725 !important;
+    font-size: 7px !important;
+    letter-spacing: .32px !important;
+  }
+}
