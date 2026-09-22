@@ -6,37 +6,25 @@ window.BerylAuth = (() => {
     return String(value ?? "").trim().toLowerCase();
   }
 
-  // Beryl has two website roles: admin and student.
-  // The database remains the source of truth for the admin account.
-  // Every other authenticated Beryl account is normalized to Student.
+  // Read/create the signed-in user's Beryl membership in Supabase.
+  // This keeps admins/blocked users unchanged, but turns a normal
+  // signed-in Beryl account into a student membership when needed.
   async function getAccountRole() {
-    const { data, error } = await supabaseClient.rpc("beryl_role");
+    const { data, error } =
+      await supabaseClient.rpc("beryl_ensure_member");
 
     if (error) {
-      console.warn(
-        "Could not load the saved Beryl role; using Student for this account:",
+      console.error(
+        "Could not load Beryl membership:",
         error.message
       );
-      return "student";
+
+      throw new Error(
+        "Could not load your Beryl account permissions. Please try again."
+      );
     }
 
-    if (data === "admin") return "admin";
-
-    // Keep the database membership synchronized as Student.
-    // The companion SQL file installs this safe helper.
-    try {
-      const { data: ensuredRole, error: ensureError } =
-        await supabaseClient.rpc("beryl_ensure_student");
-
-      if (!ensureError && ensuredRole === "admin") return "admin";
-      if (ensureError) {
-        console.warn("Beryl student-role sync unavailable:", ensureError.message);
-      }
-    } catch (error) {
-      console.warn("Beryl student-role sync unavailable:", error);
-    }
-
-    return "student";
+    return data || "pending";
   }
 
   // Prepare the user information displayed on the website.
@@ -52,7 +40,7 @@ window.BerylAuth = (() => {
       email: user.email,
       username: username,
       name: username,
-      role: role === "admin" ? "admin" : "student"
+      role: role
     };
   }
 
@@ -98,9 +86,7 @@ window.BerylAuth = (() => {
         options: {
           data: {
             username: username,
-            display_name: username,
-            class_id: "beryl",
-            role: "student"
+            display_name: username
           }
         }
       });
@@ -118,10 +104,9 @@ window.BerylAuth = (() => {
       throw new Error("The account could not be created.");
     }
 
-    // Public registration creates a Student account only.
-    // Admin is never granted from the public sign-up form.
-    // Email confirmation may still be required before sign-in.
-    return formatUser(data.user, "student");
+    // New accounts start as pending.
+    // An account may still need email confirmation.
+    return formatUser(data.user, "pending");
   }
 
   // Sign in to an existing account.
