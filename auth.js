@@ -6,16 +6,17 @@ window.BerylAuth = (() => {
     return String(value ?? "").trim().toLowerCase();
   }
 
-  // Read/create the signed-in user's Beryl membership in Supabase.
-  // This keeps admins/blocked users unchanged, but turns a normal
-  // signed-in Beryl account into a student membership when needed.
+  // Read or create the signed-in user's Beryl membership.
+  // IMPORTANT: Storage RLS reads public.beryl_members, so returning
+  // "student" only in JavaScript is not enough. This RPC makes sure the
+  // actual signed-in account has a real Beryl membership row.
   async function getAccountRole() {
     const { data, error } =
       await supabaseClient.rpc("beryl_ensure_member");
 
     if (error) {
       console.error(
-        "Could not load Beryl membership:",
+        "Could not load/create Beryl membership:",
         error.message
       );
 
