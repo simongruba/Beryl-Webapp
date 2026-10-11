@@ -3046,3 +3046,9 @@ header#site-header a.brand .brand-word > small.brand-subtitle {
     letter-spacing: .32px !important;
   }
 }
+
+/* Welcome screen gate takes precedence over all design-layer rules. */
+html.beryl-pre-entry #site-header,
+html.beryl-pre-entry main,
+html.beryl-pre-entry .section-rail,
+#site-header[hidden], main[hidden], .section-rail[hidden] { display: none !important; }

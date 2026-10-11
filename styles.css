@@ -7364,3 +7364,158 @@ header nav a.active {
   position: relative;
   z-index: 1;
 }
+
+
+/* =========================================================
+   CLASS PORTRAIT — FULL IMAGE ON ALL SCREEN SIZES (2026-10-11)
+   Beryl keeps its two-sided flip effect. Each side's original
+   aspect ratio drives the frame height, not the viewport height.
+   This intentionally does not affect student/album thumbnails.
+   ========================================================= */
+.hero #class-photo.flip {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: var(--class-photo-ratio, 1.43) !important;
+  padding: 0;
+  overflow: hidden;
+}
+.hero #class-photo .flip-inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero #class-photo .face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px !important;
+}
+.hero #class-photo .face > img.media-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: auto;
+  object-fit: contain !important;
+  object-position: center center !important;
+  /* Previous saved crop/zoom settings must not hide classmates. */
+  transform: none !important;
+}
+.hero #class-photo .face > .placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ==============================================================
+   BERYL OPENING + MOBILE ALBUM SAFETY FIX (2026-10-11)
+   No main page, album or navbar may appear before Enter is clicked.
+   =============================================================== */
+body.intro-locked #site-header,
+body.intro-locked main,
+body.intro-locked .section-rail,
+body.intro-locked #mobile-menu-backdrop {
+  display: none !important;
+}
+body.intro-locked {
+  overflow: hidden !important;
+}
+#opening {
+  z-index: 10000 !important;
+  opacity: 1;
+}
+#opening[hidden] {
+  display: none !important;
+}
+#opening.dismissed {
+  opacity: 0;
+}
+/* Restore uncluttered album pagination on phones; keep original card design. */
+@media (max-width: 760px) {
+  #memories .album-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  #memories .album-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  /* Original Memories behavior: square thumbnail; full-size photo opens in modal. */
+  #memories .album-cover {
+    aspect-ratio: 1 / 1;
+    height: auto !important;
+  }
+  #memories .album-cover .media-image,
+  #memories .album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+@media (max-width: 520px) {
+  #memories .album-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 330px;
+    margin-inline: auto;
+    width: 100%;
+  }
+  #memories .album-card {
+    margin-top: 0 !important;
+  }
+  #memories .album-cover {
+    aspect-ratio: 1 / 1;
+    height: auto !important;
+  }
+}
+
+/* =============================================================
+   BERYL V2: WELCOME GATE + MOBILE HEADER PLACEMENT
+   Force-hide the whole app before Enter, even if the mobile header
+   theme has display:grid !important; never clip the top bar.
+   ============================================================= */
+html.beryl-pre-entry #site-header,
+html.beryl-pre-entry main,
+html.beryl-pre-entry .section-rail,
+html.beryl-pre-entry #mobile-menu-backdrop,
+#site-header[hidden],
+main[hidden],
+.section-rail[hidden] {
+  display: none !important;
+}
+html.beryl-pre-entry,
+body.intro-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+#opening:not([hidden]) {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100svh !important;
+  z-index: 10000 !important;
+}
+@media (max-width: 760px) {
+  html:not(.beryl-pre-entry) header#site-header {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+    box-sizing: border-box;
+    align-items: center !important;
+    align-content: center !important;
+  }
+  html:not(.beryl-pre-entry) header#site-header > .brand,
+  html:not(.beryl-pre-entry) header#site-header > #account {
+    align-self: center !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}

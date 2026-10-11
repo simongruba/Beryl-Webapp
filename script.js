@@ -873,9 +873,26 @@ function confirmDelete(action) {
     }
   };
 }
+// The front and back may have completely different image proportions.
+// Use the displayed picture's actual pixel dimensions so the holder grows
+// naturally with its content on both desktop and mobile.
+function updateClassPhotoRatio() {
+  const holder = $("#class-photo");
+  const face = holder.classList.contains("flipped")
+    ? $("#class-back")
+    : $("#class-front");
+  const photo = face.querySelector("img.media-image");
+  const width = photo?.naturalWidth || 0;
+  const height = photo?.naturalHeight || 0;
+  holder.style.setProperty(
+    "--class-photo-ratio",
+    width > 0 && height > 0 ? `${width} / ${height}` : "1.43"
+  );
+}
 function showHeroSide(side) {
   const back = Number(side) === 1;
   $("#class-photo").classList.toggle("flipped", back);
+  updateClassPhotoRatio();
   $("#class-photo").setAttribute("aria-label", back
     ? "Showing back class photo. Click to show front."
     : "Showing front class photo. Click to show back.");
@@ -887,13 +904,18 @@ function showHeroSide(side) {
 function renderHero() {
   $("#class-front").innerHTML = media(state.hero[0], "Front class photo");
   $("#class-back").innerHTML = media(state.hero[1], "Back class photo");
+  // Uploaded/cloud photos load asynchronously; refit the frame once each
+  // image's natural width and height become known.
+  $$("#class-photo .face img.media-image").forEach(photo => {
+    photo.addEventListener("load", updateClassPhotoRatio, { once: true });
+  });
   $("#hero-tools").innerHTML = admin()
     ? [0, 1].map(side => `
         <div class="hero-tool-group">
           <button type="button" class="hero-side-button" data-hero-side="${side}">
             ${side === 0 ? "Front photo" : "Back photo"} <span>View this side ↗</span>
           </button>
-          ${mediaTools(`hero:${side}`, state.hero[side])}
+          ${mediaTools(`hero:${side}`, state.hero[side], false)}
         </div>
       `).join("")
     : "";
@@ -1627,7 +1649,7 @@ function deleteBirthday(id) {
 
 const messageCount = () => (innerWidth <= 760 ? 1 : 3);
 const albumCount = () =>
-  innerWidth <= 350 ? 1 : innerWidth <= 480 ? 2 : innerWidth <= 760 ? 3 : 4;
+  innerWidth <= 520 ? 1 : innerWidth <= 760 ? 2 : 4;
 function note(m, full = false) {
   const color = /^#[0-9a-f]{6}$/i.test(m.color) ? m.color : "#e4efbb";
   const rgb = color
@@ -2241,37 +2263,79 @@ $("#message-text").addEventListener(
       `${$("#message-text").value.length} / 1000`),
 );
 updateComposerColor();
-// A short, skippable opening; all controls remain accessible after dismissal.
+// Full-screen opening: keep all app content physically hidden until Enter.
+// The HTML starts with [hidden] on the header, main and section rail, so
+// slow mobile browsers cannot paint them behind the welcome screen.
 const intro = $("#opening");
+const mainSurfaces = [$("#site-header"), $("main"), $(".section-rail")];
+const mobileBackdrop = $("#mobile-menu-backdrop");
+let introDismissTimeout;
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
+function showOpening() {
+  clearTimeout(introDismissTimeout);
+  document.documentElement.classList.add("beryl-pre-entry");
+  document.body.classList.add("intro-locked", "opening-active");
+  mainSurfaces.forEach((el) => {
+    if (!el) return;
+    el.hidden = true;
+    el.inert = true;
+  });
+  if (mobileBackdrop) {
+    mobileBackdrop.hidden = true;
+    mobileBackdrop.inert = true;
+  }
+  if (typeof setMobileMenu === "function") setMobileMenu(false);
+  intro.classList.remove("dismissed");
+  intro.hidden = false;
+  window.scrollTo(0, 0);
+}
 function dismissOpening() {
-  intro.classList.add("dismissed");
-  document.body.classList.remove("opening-active");
-  for (const el of [$("#site-header"), $("main"), $(".section-rail")])
+  if (!document.documentElement.classList.contains("beryl-pre-entry")) return;
+  clearTimeout(introDismissTimeout);
+  // Ignore an old scroll position or section fragment left by the browser.
+  window.scrollTo({ left: 0, top: 0, behavior: "instant" });
+  mainSurfaces.forEach((el) => {
+    if (!el) return;
+    el.hidden = false;
     el.inert = false;
-  setTimeout(() => {
-    intro.hidden = true;
-  }, 650);
+  });
+  if (mobileBackdrop) mobileBackdrop.inert = false;
+  document.documentElement.classList.remove("beryl-pre-entry");
+  document.body.classList.remove("intro-locked", "opening-active");
+  // The header is now measurable. Discard any stale inline 0px height.
+  document.documentElement.style.removeProperty("--header-height");
+  updateSectionNavigation();
+  intro.classList.add("dismissed");
+  // Keep the welcome overlay during its exit animation, then remove it.
+  introDismissTimeout = setTimeout(() => { intro.hidden = true; }, 650);
+  window.scrollTo({ left: 0, top: 0, behavior: "instant" });
 }
 $("#skip-opening").addEventListener("click", () => {
   dismissOpening();
   $("header .brand").focus();
 });
-// Entry is always explicit, including when reduced motion is enabled.
-document.body.classList.add("opening-active");
-for (const el of [$("#site-header"), $("main"), $(".section-rail")])
-  el.inert = true;
+// Going back to the website should always return to the welcome screen.
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) showOpening();
+});
+showOpening();
 if (matchMedia("(prefers-reduced-motion: reduce)").matches)
   intro.classList.add("reduced-opening");
 // Free scrolling: this listener only highlights the visible section in navigation.
 // It never moves the page or centers a panel.
 let scrollFrame = 0;
 function updateSectionNavigation() {
-  const headerHeight = $("#site-header").getBoundingClientRect().height;
-  document.documentElement.style.setProperty(
-    "--header-height",
-    `${headerHeight}px`,
-  );
+  // Never measure the header while the intro gate hides it: its rect is 0px.
+  // Writing that zero to --header-height would collapse the mobile toolbar.
+  const header = $("#site-header");
+  if (header.hidden || document.documentElement.classList.contains("beryl-pre-entry")) {
+    scrollFrame = 0;
+    return;
+  }
+  const measuredHeight = header.getBoundingClientRect().height;
+  const headerHeight = measuredHeight >= 48 ? measuredHeight : 64;
+  document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
   const center = headerHeight + (innerHeight - headerHeight) / 2;
   const panels = $$("main>section");
   const nearest = panels.reduce(

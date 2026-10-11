@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="beryl-pre-entry">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -9,10 +9,30 @@
       content="The home of Grade 10 Beryl. Our people, little notes, and memories together."
     />
     <link rel="icon" type="image/svg+xml" href="assets/beryl-mark.svg" />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="theme-3d.css" />
+    <!-- Protect the opening screen before CSS and JavaScript finish loading. -->
+    <style>
+      html.beryl-pre-entry #site-header,
+      html.beryl-pre-entry main,
+      html.beryl-pre-entry .section-rail,
+      html.beryl-pre-entry #mobile-menu-backdrop,
+      #site-header[hidden],
+      main[hidden],
+      .section-rail[hidden],
+      body.intro-locked #site-header,
+      body.intro-locked main,
+      body.intro-locked .section-rail,
+      body.intro-locked #mobile-menu-backdrop {
+        display: none !important;
+      }
+      html.beryl-pre-entry,
+      body.intro-locked { overflow: hidden !important; }
+      #opening { position: fixed !important; inset: 0 !important; z-index: 10000 !important; }
+      #opening[hidden] { display: none !important; }
+    </style>
+    <link rel="stylesheet" href="styles.css?v=beryl-mobile-intro-v2-20261011" />
+    <link rel="stylesheet" href="theme-3d.css?v=beryl-mobile-intro-v2-20261011" />
   </head>
-  <body>
+  <body class="intro-locked opening-active">
     <div class="opening" id="opening">
       <img
         class="opening-mark"
@@ -76,7 +96,7 @@
       <div id="opening-birthday" class="opening-birthday" hidden></div>
       <button id="skip-opening" class="outline">Enter classroom ↗</button>
     </div>
-    <header id="site-header">
+    <header id="site-header" hidden>
       <button
         id="mobile-menu-toggle"
         class="mobile-menu-toggle"
@@ -133,7 +153,7 @@
       aria-label="Close classroom menu"
       hidden
     ></button>
-    <main>
+    <main hidden>
       <section id="home" class="hero">
         <span class="classroom-sticker sticker-plane" aria-hidden="true"></span>
         <div class="hero-copy">
@@ -429,7 +449,7 @@
         </footer>
       </section>
     </main>
-    <nav class="section-rail" aria-label="Section shortcuts">
+    <nav class="section-rail" aria-label="Section shortcuts" hidden>
       <a href="#home" aria-label="Home"></a>
       <a href="#berylites" aria-label="Berylites"></a>
       <a href="#officers" aria-label="Officers"></a>
@@ -456,6 +476,6 @@
     <script src="roster.js"></script>
     <script src="admin-config.js"></script>
     <script src="auth.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=beryl-mobile-intro-v2-20261011"></script>
   </body>
 </html>
